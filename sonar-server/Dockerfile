@@ -14,6 +14,10 @@ ENV SONAR_VERSION=${SONAR_VERSION} \
 # Http port
 EXPOSE 9000
 
+# Sonarqube installation directory
+RUN mkdir -p $SONARQUBE_HOME
+WORKDIR $SONARQUBE_HOME
+
 RUN set -x \
     && apk add --no-cache gnupg unzip \
     && apk add --no-cache libressl wget \
@@ -35,7 +39,6 @@ RUN set -x \
 
 VOLUME "$SONARQUBE_HOME/data"
 
-#WORKDIR $SONARQUBE_HOME
 #COPY run.sh $SONARQUBE_HOME/bin/
 
 # Make daemon service dir for sonarqube and place file
@@ -43,7 +46,7 @@ VOLUME "$SONARQUBE_HOME/data"
 RUN mkdir -p /etc/service/sonarqube
 ADD start.sh /etc/service/sonarqube/run
 
-ENV COMMAND "java -jar lib/sonar-application-$SONAR_VERSION.jar \
+ENV COMMAND "java -jar ${SONARQUBE_HOME}/lib/sonar-application-$SONAR_VERSION.jar \
             -Dsonar.log.console=true \
             -Dsonar.jdbc.username=\"$SONARQUBE_JDBC_USERNAME\" \
             -Dsonar.jdbc.password=\"$SONARQUBE_JDBC_PASSWORD\" \
