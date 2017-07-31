@@ -33,11 +33,11 @@ RUN set -ex; \
     wget -O sonarqube.zip.asc --no-verbose https://sonarsource.bintray.com/Distribution/sonarqube/sonarqube-$SONAR_VERSION.zip.asc; \
     gpg --batch --verify sonarqube.zip.asc sonarqube.zip; \
     unzip sonarqube.zip; \
-    mv sonarqube-$SONAR_VERSION/* ../; \
-    rm -rf sonarqube-$SONAR_VERSION; \
+    mv sonarqube-${SONAR_VERSION} sonarqube; \
+#    rm -rf sonarqube-$SONAR_VERSION; \
     rm sonarqube.zip*; \
     rm -rf $SONARQUBE_HOME/bin/*; \
-    cd $SONARQUBE_HOME; \
+    cd $SONARQUBE_HOME/sonarqube-${SONAR_VERSION}; \
     for path in \
   		./bin \
   		./data \
@@ -45,24 +45,22 @@ RUN set -ex; \
   		./conf \
   		./lib \
   	; do \
-      mkdir -p ""$path"; \
+      mkdir -p "$path"; \
   		chown -R stakater:stakater "$path"; \
-  	done; \
+  	done;
 
-VOLUME "$SONARQUBE_HOME/data"
-
-#COPY run.sh $SONARQUBE_HOME/bin/
+VOLUME "$SONARQUBE_HOME/sonarqube-${SONAR_VERSION}/data"
 
 # Make daemon service dir for sonarqube and place file
 # It will be started and maintained by the base image
 RUN mkdir -p /etc/service/sonarqube
 ADD start.sh /etc/service/sonarqube/run
 
-ENV COMMAND "java -jar ${SONARQUBE_HOME}/lib/sonar-application-$SONAR_VERSION.jar \
+ENV COMMAND "java -jar ${SONARQUBE_HOME}/sonarqube-${SONAR_VERSION}/lib/sonar-application-$SONAR_VERSION.jar \
             -Dsonar.log.console=true \
             -Dsonar.jdbc.username=\"$SONARQUBE_JDBC_USERNAME\" \
             -Dsonar.jdbc.password=\"$SONARQUBE_JDBC_PASSWORD\" \
-            -Dsonar.jdbc.url=\"$SONARQUBE_JDBC_URL\" \
+#            -Dsonar.jdbc.url=\"$SONARQUBE_JDBC_URL\" \
             -Dsonar.web.javaAdditionalOpts=\"$SONARQUBE_WEB_JVM_OPTS -Djava.security.egd=file:/dev/./urandom\""
 
 #RUN sed -i 's|#wrapper.java.additional.6=-server|wrapper.java.additional.6=-server|g' /opt/sonar/conf/wrapper.conf
