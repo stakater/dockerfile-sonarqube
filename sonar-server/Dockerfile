@@ -15,8 +15,7 @@ ENV SONAR_VERSION=${SONAR_VERSION} \
 EXPOSE 9000
 
 # Sonarqube installation directory
-RUN mkdir -p $SONARQUBE_HOME
-WORKDIR $SONARQUBE_HOME
+#RUN mkdir -p $SONARQUBE_HOME
 
 RUN set -ex; \
     apk add --no-cache gnupg unzip; \
@@ -34,29 +33,32 @@ RUN set -ex; \
     gpg --batch --verify sonarqube.zip.asc sonarqube.zip; \
     unzip sonarqube.zip; \
     mv sonarqube-${SONAR_VERSION} sonarqube; \
-#    rm -rf sonarqube-$SONAR_VERSION; \
     rm sonarqube.zip*; \
     rm -rf $SONARQUBE_HOME/bin/*; \
-    cd $SONARQUBE_HOME/sonarqube-${SONAR_VERSION}; \
+    cd $SONARQUBE_HOME/; \
     for path in \
   		./bin \
   		./data \
   		./logs \
   		./conf \
   		./lib \
+      ./extensions \
+      ./web \
+      ./temp \
   	; do \
       mkdir -p "$path"; \
   		chown -R stakater:stakater "$path"; \
   	done;
-
-VOLUME "$SONARQUBE_HOME/sonarqube-${SONAR_VERSION}/data"
 
 # Make daemon service dir for sonarqube and place file
 # It will be started and maintained by the base image
 RUN mkdir -p /etc/service/sonarqube
 ADD start.sh /etc/service/sonarqube/run
 
-ENV COMMAND "java -jar ${SONARQUBE_HOME}/sonarqube-${SONAR_VERSION}/lib/sonar-application-$SONAR_VERSION.jar \
+WORKDIR $SONARQUBE_HOME
+VOLUME "$SONARQUBE_HOME/data"
+
+ENV COMMAND "java -jar ${SONARQUBE_HOME}/lib/sonar-application-$SONAR_VERSION.jar \
             -Dsonar.log.console=true \
             -Dsonar.jdbc.username=\"$SONARQUBE_JDBC_USERNAME\" \
             -Dsonar.jdbc.password=\"$SONARQUBE_JDBC_PASSWORD\" \
