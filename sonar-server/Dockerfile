@@ -46,9 +46,15 @@ RUN set -ex; \
       ./web \
       ./temp \
   	; do \
-      mkdir -p "$path"; \
   		chown -R stakater:stakater "$path"; \
   	done;
+
+#RUN set -ex; \
+#    sed -i 's|#wrapper.java.additional.6=-server|wrapper.java.additional.6=-server|g' /opt/sonarqube/conf/wrapper.conf; \
+#    sed -i 's|#sonar.jdbc.password=sonar|sonar.jdbc.password=123qwe|g' /opt/sonarqube/conf/sonar.properties; \
+#    sed -i 's|#sonar.jdbc.user=sonar|sonar.jdbc.user=sonar|g' /opt/sonarqube/conf/sonar.properties; \
+#    sed -i 's|sonar.jdbc.url=jdbc:h2|#sonar.jdbc.url=jdbc:h2|g' /opt/sonarqube/conf/sonar.properties; \
+#    sed -i 's|#sonar.jdbc.url=jdbc:mysql://localhost|sonar.jdbc.url=jdbc:mysql://${env:DB_PORT_3306_TCP_ADDR}|g' /opt/sonarqube/conf/sonar.properties;
 
 # Make daemon service dir for sonarqube and place file
 # It will be started and maintained by the base image
@@ -63,11 +69,5 @@ ENV COMMAND "java -jar ${SONARQUBE_HOME}/lib/sonar-application-$SONAR_VERSION.ja
             -Dsonar.jdbc.username=\"$SONARQUBE_JDBC_USERNAME\" \
             -Dsonar.jdbc.password=\"$SONARQUBE_JDBC_PASSWORD\" \
 #            -Dsonar.jdbc.url=\"$SONARQUBE_JDBC_URL\" \
-            -Dsonar.web.javaAdditionalOpts=\"$SONARQUBE_WEB_JVM_OPTS -Djava.security.egd=file:/dev/./urandom\""
-
-#RUN sed -i 's|#wrapper.java.additional.6=-server|wrapper.java.additional.6=-server|g' /opt/sonar/conf/wrapper.conf
-
-#RUN sed -i 's|#sonar.jdbc.password=sonar|sonar.jdbc.password=123qwe|g' /opt/sonar/conf/sonar.properties
-#RUN sed -i 's|#sonar.jdbc.user=sonar|sonar.jdbc.user=sonar|g' /opt/sonar/conf/sonar.properties
-#RUN sed -i 's|sonar.jdbc.url=jdbc:h2|#sonar.jdbc.url=jdbc:h2|g' /opt/sonar/conf/sonar.properties
-#RUN sed -i 's|#sonar.jdbc.url=jdbc:mysql://localhost|sonar.jdbc.url=jdbc:mysql://${env:DB_PORT_3306_TCP_ADDR}|g' /opt/sonar/conf/sonar.properties
+            -Dsonar.web.javaAdditionalOpts=-Djava.security.egd=file:/dev/./urandom"
+#            -Dsonar.web.javaAdditionalOpts=\"$SONARQUBE_WEB_JVM_OPTS -Djava.security.egd=file:/dev/./urandom\""
