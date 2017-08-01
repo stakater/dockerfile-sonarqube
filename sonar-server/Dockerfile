@@ -14,9 +14,6 @@ ENV SONAR_VERSION=${SONAR_VERSION} \
 # Http port
 EXPOSE 9000
 
-# Sonarqube installation directory
-#RUN mkdir -p $SONARQUBE_HOME
-
 RUN set -ex; \
     apk add --no-cache gnupg unzip; \
     apk add --no-cache libressl wget; \
@@ -34,20 +31,8 @@ RUN set -ex; \
     unzip sonarqube.zip; \
     mv sonarqube-${SONAR_VERSION} sonarqube; \
     rm sonarqube.zip*; \
-    rm -rf $SONARQUBE_HOME/bin/*; \
-    cd $SONARQUBE_HOME/; \
-    for path in \
-  		./bin \
-  		./data \
-  		./logs \
-  		./conf \
-  		./lib \
-      ./extensions \
-      ./web \
-      ./temp \
-  	; do \
-  		chown -R stakater:stakater "$path"; \
-  	done;
+    rm -rf $SONARQUBE_HOME/bin/*;
+
 
 #RUN set -ex; \
 #    sed -i 's|#wrapper.java.additional.6=-server|wrapper.java.additional.6=-server|g' /opt/sonarqube/conf/wrapper.conf; \
